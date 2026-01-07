@@ -1,0 +1,34 @@
+File HAndling:
+- File handling allows a program to store data permanently
+- read existing data
+- modify files
+- process large datasets
+
+python uses file objects to interact with files stored on disk
+
+
+Types of file in python
+- text files(Human readable)
+	.txt, .csv, .json, .log
+	
+-Binary files(Machine readable)
+	.jpg, .pdf, .exe
+
+--------------------
+File I/O
+
+Opening a file:
+	syntax: file_object = open("filename", "mode")
+	
+file modes
+Mode 		Meaning
+r			Read
+w			write
+a  			append
+x			create(fail if exists)
+rb			read binary
+wb			write binary
+r+			read + write 
+
+
+File HAndling Exceptions
