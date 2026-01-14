@@ -25,7 +25,7 @@ def get_db():
 def get_all_documents(db: Session = Depends(get_db)):
     return db.query(Document).order_by(Document.uploaded_at.desc()).all()
 
-@app.post("/upload", response_model=list[DocumentResponse])
+@app.post("/upload")
 def upload_document(
     file: UploadFile = File(...),
     tags: str = Query(...),
@@ -77,12 +77,12 @@ def get_versions(filename: str, db: Session = Depends(get_db)):
 
 @app.delete("/delete")
 def delete_document(
-    title: str,
+    filename: str,
     version: int,
     db: Session = Depends(get_db)
 ):
     document = db.query(Document).filter(
-        Document.title == title,
+        Document.filename == filename,
         Document.version == version
     ).first()
 
@@ -90,8 +90,8 @@ def delete_document(
         raise HTTPException(status_code=404, detail="Document not found")
 
     # Delete file from uploads folder
-    if os.path.exists(document.file_path):
-        os.remove(document.file_path)
+    if os.path.exists(document.filepath):
+        os.remove(document.filepath)
 
     # Delete DB record
     db.delete(document)
@@ -99,6 +99,6 @@ def delete_document(
 
     return {
         "message": "Document deleted successfully",
-        "title": title,
+        "filename": filename,
         "version": version
     }
