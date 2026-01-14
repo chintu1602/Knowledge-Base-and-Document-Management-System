@@ -1,0 +1,7 @@
+fastapi
+sqlalchemy
+pydantic
+uvicorn
+pwdlib[argon2]
+python-jose
+python-multipart
