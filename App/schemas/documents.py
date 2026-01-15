@@ -8,7 +8,7 @@ class DocumentCreate(BaseModel):
 
 class DocumentResponse(BaseModel):
     title: str
-    description: str
+    description: Optional[str]
     created_at:datetime
 
     class Config:
