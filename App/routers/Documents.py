@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends,UploadFile,File,HTTPException
+from fastapi import APIRouter, Depends,UploadFile,File,HTTPException,Query,status
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from App.database import get_db
 from App.dependency import get_current_user
 from App.schemas.documents import DocumentCreate,DocumentResponse,DocumentVersionResponse,DocumentUpdate
@@ -15,6 +16,7 @@ router = APIRouter(prefix="/documents", tags=["Documents"])
 def create_document(
     title: str,
     description: str = None,
+    tag:str=None,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
     user_id: int = Depends(get_current_user)
@@ -26,6 +28,7 @@ def create_document(
     document = Document(
         title=title,
         description=description,
+        tag=tag,
         owner_id=user_id
     )
     db.add(document)
@@ -88,9 +91,28 @@ def upload_new_version(
         "message": "New version uploaded",
         "version": new_version_number
     }
- 
+@router.get("/tag_search",response_model=list[DocumentResponse])
 
-@router.get("/", response_model=list[DocumentResponse])
+def list_doc_viatag(tag:str= Query(...),db:Session=Depends(get_db),user_id:int=Depends(get_current_user)):
+   if not tag:
+        return []   # 🔥 THIS LINE FIXES YOUR BUG
+
+   documents = (
+        db.query(Document)
+        .filter(
+            Document.owner_id == user_id,
+            Document.tag.isnot(None),
+            Document.tag.ilike(f"%{tag}%")
+        )
+        .order_by(Document.created_at.desc())
+        .all()
+    )
+   if documents:
+       return documents
+   else:
+       raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="not found.. ")
+
+@router.get("/list_all", response_model=list[DocumentResponse])
 def list_my_documents(
     db: Session = Depends(get_db),
     user_id: int = Depends(get_current_user)
@@ -98,6 +120,10 @@ def list_my_documents(
     documents =db.query(Document).filter(Document.owner_id == user_id).order_by(Document.created_at.desc()).all()
     
     return documents
+
+
+ 
+
 
 @router.get("/{document_id}/versions", response_model=list[DocumentVersionResponse])
 def list_document_versions(
@@ -165,7 +191,7 @@ def download_version(
 
 
 
-@router.put("/{document_id}")
+@router.put("/update/{document_id}")
 def update_document(
     document_id: int,
     data: DocumentUpdate,
@@ -188,7 +214,7 @@ def update_document(
     db.commit()
     return {"message": "Document updated"}
 
-@router.delete("/{document_id}")
+@router.delete("/delete/{document_id}")
 def delete_document(
     document_id: int,
     db: Session = Depends(get_db),

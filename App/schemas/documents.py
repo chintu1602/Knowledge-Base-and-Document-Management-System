@@ -4,7 +4,8 @@ from datetime import datetime
 
 class DocumentCreate(BaseModel):
     title: str
-    description: Optional[str]
+    description: Optional[str]=None
+    tag:Optional[str]=None
 
 class DocumentResponse(BaseModel):
     title: str
