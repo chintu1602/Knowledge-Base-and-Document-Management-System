@@ -12,6 +12,7 @@ import os
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
+# Creating a Document 
 @router.post("/")
 def create_document(
     title: str,
@@ -51,7 +52,7 @@ def create_document(
         "version": 1
     }
 
-
+#uploading newer version of existing document..
 @router.post("/{document_id}/versions")
 def upload_new_version(
     document_id: int,
@@ -91,8 +92,9 @@ def upload_new_version(
         "message": "New version uploaded",
         "version": new_version_number
     }
-@router.get("/tag_search",response_model=list[DocumentResponse])
 
+#Tag based searching ...
+@router.get("/tag_search",response_model=list[DocumentResponse])
 def list_doc_viatag(tag:str= Query(...),db:Session=Depends(get_db),user_id:int=Depends(get_current_user)):
    if not tag:
         return []   # 🔥 THIS LINE FIXES YOUR BUG
@@ -112,6 +114,7 @@ def list_doc_viatag(tag:str= Query(...),db:Session=Depends(get_db),user_id:int=D
    else:
        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="not found.. ")
 
+#Getting all the documents..
 @router.get("/list_all", response_model=list[DocumentResponse])
 def list_my_documents(
     db: Session = Depends(get_db),
@@ -122,9 +125,7 @@ def list_my_documents(
     return documents
 
 
- 
-
-
+ #Getting all the verions of a document 
 @router.get("/{document_id}/versions", response_model=list[DocumentVersionResponse])
 def list_document_versions(
     document_id: int,
@@ -151,7 +152,7 @@ def list_document_versions(
     return versions
 
 
-
+#Downloading a particular document
 @router.get("/{document_id}/versions/{version_id}/download")
 def download_version(
     document_id: int,
@@ -190,7 +191,7 @@ def download_version(
 
 
 
-
+#Updating a document
 @router.put("/update/{document_id}")
 def update_document(
     document_id: int,
@@ -214,6 +215,7 @@ def update_document(
     db.commit()
     return {"message": "Document updated"}
 
+#Deleting a document..
 @router.delete("/delete/{document_id}")
 def delete_document(
     document_id: int,
@@ -233,7 +235,7 @@ def delete_document(
         if os.path.exists(version.file_path):
             os.remove(version.file_path)
 
-    # 2 Delete document (cascade deletes versions)
+    # 2 Delete document
     db.delete(document)
     db.commit()
 

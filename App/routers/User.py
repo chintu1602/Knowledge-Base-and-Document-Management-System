@@ -8,6 +8,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter(prefix="/auth", tags=["Authorization"])
 
+#User creation(signup)
 @router.post("/register")
 def register(request: UserCreate, db: Session = Depends(get_db)):
     if db.query(User).filter(User.Username == request.username).first():
@@ -21,6 +22,7 @@ def register(request: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "User created"}
 
+#Userlogin and token giving
 @router.post("/login")
 def login(request:OAuth2PasswordRequestForm=Depends() , db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.Username == request.username).first()
