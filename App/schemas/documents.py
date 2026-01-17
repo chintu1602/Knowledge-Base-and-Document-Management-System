@@ -25,3 +25,4 @@ class DocumentVersionResponse(BaseModel):
 class DocumentUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
+    tag: Optional[str] = None  

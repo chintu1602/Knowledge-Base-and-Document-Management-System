@@ -97,7 +97,7 @@ def upload_new_version(
 @router.get("/tag_search",response_model=list[DocumentResponse])
 def list_doc_viatag(tag:str= Query(...),db:Session=Depends(get_db),user_id:int=Depends(get_current_user)):
    if not tag:
-        return []   # 🔥 THIS LINE FIXES YOUR BUG
+        return []   #THIS LINE FIXES YOUR BUG
 
    documents = (
         db.query(Document)
@@ -211,6 +211,8 @@ def update_document(
         document.title = data.title
     if data.description is not None:
         document.description = data.description
+    if data.tag is not None:
+        document.tag = data.tag
 
     db.commit()
     return {"message": "Document updated"}
