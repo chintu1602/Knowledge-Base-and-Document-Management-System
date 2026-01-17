@@ -1,14 +1,15 @@
 from fastapi import APIRouter, Depends,UploadFile,File,HTTPException,Query,status
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from fastapi.responses import FileResponse
+import os
+
 from App.database import get_db
 from App.dependency import get_current_user
 from App.schemas.documents import DocumentCreate,DocumentResponse,DocumentVersionResponse,DocumentUpdate
 from App.models.Documents import Document
 from App.models.Versions import DocumentVersion
 from App.utils.filehandler import save_file
-from fastapi.responses import FileResponse
-import os
+
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
